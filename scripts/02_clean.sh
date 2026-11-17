@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-# Stage 2: clean the raw data
+# part 2: clean raw data
