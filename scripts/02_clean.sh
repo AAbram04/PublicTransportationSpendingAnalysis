@@ -54,8 +54,8 @@ NR == 1 {
 
   for(i = 1; i <= field_count; i++) {
     if($i == "" ||
-      $i == "NA ||
-      $i = "N/A" ||
+      $i == "NA" ||
+      $i == "N/A" ||
       $i == "NULL" ||
       $i == "null") {
       missing[i]++
@@ -74,7 +74,7 @@ END {
   for(i = 1; i <= field_count; i++){
     percent = rows ? 100 * missing[i] / rows : 0
 
-    printf "%s\t%d\t%.2f%%\n", \
+    printf "%s\t%d\t%d\t%.2f%%\n", \
     header[i], \
     missing[i] + 0, \
     rows, \
@@ -83,7 +83,7 @@ END {
 }
 
 ' "$CLEAN" > "$MISSING"
-log "Missing-value report created: "$MISSING"
+log "Missing-value report created: $MISSING"
 
 # 1: standardize NTD ID, Legacy NTD ID
 awk -F'\t' -v OFS='\t' -v rej="$REJECTED" '
