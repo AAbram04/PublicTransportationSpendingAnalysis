@@ -10,6 +10,7 @@ TMP="data/clean/tmp.tsv"
 MSG="data/clean/tmp.msg"
 REJECTED="data/clean/rejected.tsv"
 LOG="logs/cleaning.log"
+MISSING="data/clean/missing_information.tsv"
 
 if [ ! -f "scripts/02_clean.sh" ]; then
     echo "ERROR: run this script from the project folder: ./scripts/02_clean.sh" >&2
@@ -37,6 +38,52 @@ awk -F'"' -v OFS='' '{ for (i = 1; i <= NF; i += 2) gsub(/,/, "\t", $i); print }
 badrows=$(awk -F'\t' 'NF != 49 { n++ } END { print n + 0 }' "$CLEAN")
 [ "$badrows" -eq 0 ] || fail "Step 0: $badrows rows do not have 49 fields"
 log "Step 0 CSV->TSV: all $(awk 'END { print NR }' "$CLEAN") lines have 49 fields"
+
+#Record any missing values before columns are dropped
+awk -F '\t' -v OFS='\t' '
+NR == 1 {
+  field_count = NF
+  for (i = 1; i <= NF; i++)
+    header[i] = $i
+  
+  next
+}
+
+{
+  rows++
+
+  for(i = 1; i <= field_count; i++) {
+    if($i == "" ||
+      $i == "NA ||
+      $i = "N/A" ||
+      $i == "NULL" ||
+      $i == "null") {
+      missing[i]++
+    }
+  
+  }
+
+}
+
+END {
+  print "field", \
+  "missing_count", \
+  "total_data_rows", \
+  "missing_percentage"
+
+  for(i = 1; i <= field_count; i++){
+    percent = rows ? 100 * missing[i] / rows : 0
+
+    printf "%s\t%d\t%.2f%%\n", \
+    header[i], \
+    missing[i] + 0, \
+    rows, \
+    percent
+  }  
+}
+
+' "$CLEAN" > "$MISSING"
+log "Missing-value report created: "$MISSING"
 
 # 1: standardize NTD ID, Legacy NTD ID
 awk -F'\t' -v OFS='\t' -v rej="$REJECTED" '
