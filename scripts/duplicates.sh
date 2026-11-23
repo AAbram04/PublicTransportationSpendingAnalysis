@@ -4,7 +4,7 @@
 set -euo pipefail
 
 INPUT="${1:-data/clean/Operating_Expenses_expenses_clean.tsv}"
-OUTDIR="data/tests"
+OUTDIR="data/ouput"
 LOGDIR="logs"
 
 if [[ ! -f "$INPUT" ]]; then
