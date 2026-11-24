@@ -3,4 +3,5 @@
 set -euo pipefail
 
 ./scripts/02_clean.sh
+./scripts/labor_analysis.sh
 ./scripts/03_analyze.sh
